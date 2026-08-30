@@ -6,8 +6,7 @@ import parking.service.UserService;
 import javax.swing.*;
 import java.awt.*;
 
-public class LoginGUI extends JFrame 
-{
+public class LoginGUI extends JFrame {
 
     private JTextField usernameField;
     private JPasswordField passwordField;
@@ -17,7 +16,9 @@ public class LoginGUI extends JFrame
 
     private final UserService userService;
 
+    // =========================
     // COLOUR THEME
+    // =========================
 
     private final Color BACKGROUND =
             new Color(238, 242, 247);
@@ -40,27 +41,10 @@ public class LoginGUI extends JFrame
     private final Color BORDER =
             new Color(200, 208, 218);
 
-    // DASHBOARD WINDOW
-    private static class DashboardGUI extends JFrame {
 
-        DashboardGUI(User user) {
-            super("Dashboard");
-            setSize(900, 600);
-            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setLocationRelativeTo(null);
-            setResizable(false);
-
-            JLabel welcomeLabel = new JLabel(
-                    "Welcome, " + (user != null ? user.getUsername() : "User")
-            );
-            welcomeLabel.setFont(new Font("Arial", Font.BOLD, 20));
-            welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-            add(welcomeLabel, BorderLayout.CENTER);
-        }
-    }
-
+    // =========================
     // CONSTRUCTOR
+    // =========================
 
     public LoginGUI() {
 
@@ -86,7 +70,10 @@ public class LoginGUI extends JFrame
         createGUI();
     }
 
+
+    // =========================
     // CREATE GUI
+    // =========================
 
     private void createGUI() {
 
@@ -99,7 +86,10 @@ public class LoginGUI extends JFrame
                 BACKGROUND
         );
 
+
+        // =========================
         // HEADER
+        // =========================
 
         JPanel headerPanel =
                 new JPanel();
@@ -125,8 +115,6 @@ public class LoginGUI extends JFrame
         );
 
 
-        // MAIN TITLE
-
         JLabel titleLabel =
                 new JLabel(
                         "SMART PARKING SYSTEM"
@@ -148,8 +136,6 @@ public class LoginGUI extends JFrame
                 Component.CENTER_ALIGNMENT
         );
 
-
-        // SUBTITLE
 
         JLabel subtitleLabel =
                 new JLabel(
@@ -195,7 +181,10 @@ public class LoginGUI extends JFrame
                 BorderLayout.NORTH
         );
 
+
+        // =========================
         // CENTER AREA
+        // =========================
 
         JPanel centerPanel =
                 new JPanel(
@@ -206,7 +195,10 @@ public class LoginGUI extends JFrame
                 BACKGROUND
         );
 
+
+        // =========================
         // LOGIN CARD
+        // =========================
 
         JPanel loginPanel =
                 new JPanel();
@@ -239,7 +231,10 @@ public class LoginGUI extends JFrame
                 )
         );
 
-        // LOGIN TITLE
+
+        // =========================
+        // WELCOME TITLE
+        // =========================
 
         JLabel loginTitle =
                 new JLabel(
@@ -267,12 +262,14 @@ public class LoginGUI extends JFrame
                 loginTitle
         );
 
-
         loginPanel.add(
                 Box.createVerticalStrut(25)
         );
 
+
+        // =========================
         // USERNAME LABEL
+        // =========================
 
         JLabel usernameLabel =
                 new JLabel(
@@ -300,12 +297,14 @@ public class LoginGUI extends JFrame
                 usernameLabel
         );
 
-
         loginPanel.add(
                 Box.createVerticalStrut(8)
         );
 
+
+        // =========================
         // USERNAME FIELD
+        // =========================
 
         usernameField =
                 new JTextField();
@@ -318,16 +317,19 @@ public class LoginGUI extends JFrame
                 Component.CENTER_ALIGNMENT
         );
 
+
         loginPanel.add(
                 usernameField
         );
-
 
         loginPanel.add(
                 Box.createVerticalStrut(18)
         );
 
+
+        // =========================
         // PASSWORD LABEL
+        // =========================
 
         JLabel passwordLabel =
                 new JLabel(
@@ -355,12 +357,14 @@ public class LoginGUI extends JFrame
                 passwordLabel
         );
 
-
         loginPanel.add(
                 Box.createVerticalStrut(8)
         );
 
+
+        // =========================
         // PASSWORD FIELD
+        // =========================
 
         passwordField =
                 new JPasswordField();
@@ -389,7 +393,10 @@ public class LoginGUI extends JFrame
                 BorderLayout.CENTER
         );
 
+
+        // =========================
         // BUTTON AREA
+        // =========================
 
         JPanel buttonPanel =
                 new JPanel(
@@ -446,7 +453,10 @@ public class LoginGUI extends JFrame
                 mainPanel
         );
 
+
+        // =========================
         // ACTIONS
+        // =========================
 
         loginButton.addActionListener(
                 e -> login()
@@ -463,7 +473,10 @@ public class LoginGUI extends JFrame
         );
     }
 
+
+    // =========================
     // TEXT FIELD STYLE
+    // =========================
 
     private void styleTextField(
             JTextField field
@@ -521,8 +534,11 @@ public class LoginGUI extends JFrame
         );
     }
 
+
+    // =========================
     // BUTTON STYLE
-    
+    // =========================
+
     private void styleButton(
             JButton button,
             Color color
@@ -587,8 +603,11 @@ public class LoginGUI extends JFrame
         );
     }
 
+
+    // =========================
     // LOGIN FUNCTION
-    
+    // =========================
+
     private void login() {
 
         String username =
@@ -653,6 +672,7 @@ public class LoginGUI extends JFrame
                 dispose();
 
 
+                // Open the REAL DashboardGUI.java
                 new DashboardGUI(
                         user
                 ).setVisible(true);
@@ -694,8 +714,11 @@ public class LoginGUI extends JFrame
         }
     }
 
+
+    // =========================
     // MAIN METHOD
-    
+    // =========================
+
     public static void main(
             String[] args
     ) {
