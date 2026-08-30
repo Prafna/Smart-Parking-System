@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<VBox
+    alignment="CENTER"
+    spacing="15"
+
+    xmlns="http://javafx.com/javafx"
+    xmlns:fx="http://javafx.com/fxml"
+
+    fx:controller="parking.controller.ParkingController">
+
+    <!--Parking page title-->
+    <Label text="Parking Management" />
+
+    <!--Display available parking -->
+    <Button text="View Available Slots" onAction="#showAvailableSlots" />
+
+    <!--Start parking session -->
+    <Button text="Start Parking Session" onAction="#startParkingSession" />
+    </VBox>
