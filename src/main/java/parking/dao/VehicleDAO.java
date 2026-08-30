@@ -1,0 +1,198 @@
+package parking.dao;
+
+import parking.model.Car;
+import parking.model.Motorbike;
+import parking.model.Van;
+import parking.model.Vehicle;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+//This class is responsible for performing CRUD operations on the Vehicle table in the database.
+public class VehicleDAO 
+{
+    //adds a new vehicle to the database
+    public boolean addVehicle(Vehicle vehicle)
+    {
+        //SQL insert statement
+        String sql = "INSERT INTO Vehicles" 
+                     +"(vehicleNumber, ownerName, contactNumber, vehicleType)"
+                     +" VALUES (?, ?, ?, ?)";
+        
+        //try-with-resources statement to automatically close the database connection and statement
+        try (Connection connection = DatabaseConnection.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql)) 
+        {
+            //put the vehicle information into the SQL statement's placeholders
+            statement.setString(1, vehicle.getVehicleNumber());
+            statement.setString(2, vehicle.getOwnerName());
+            statement.setString(3, vehicle.getContactNumber());
+            statement.setString(4, vehicle.getVehicleType());
+            
+            //execute the INSERT statement and return true if the insertion was successful (i.e., at least one row was affected)
+            int rowsInserted = statement.executeUpdate();
+            return rowsInserted > 0;
+        } 
+        catch (SQLException e) 
+        {
+            System.out.println("Error adding vehicle to the database: " + e.getMessage());
+            
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //READ
+    //retrieves all vehicles from the database
+    public List<Vehicle> getAllVehicles()
+    {
+        //create and empty list to store the vehicles
+        List<Vehicle> vehicles = new ArrayList<>();
+
+        //SQL select statement
+        String sql = "SELECT * FROM Vehicles";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) 
+        {
+            //read each row returned by SQL server
+            while (resultSet.next()) 
+            {
+                //convert the database row into a java vehicle object
+                Vehicle vehicle = createVehicleFromResultSet(resultSet);
+                vehicles.add(vehicle);
+            }
+        } 
+        catch (SQLException e) 
+        {
+            System.out.println("Error retrieving vehicles from the database: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return vehicles;
+    }
+
+    //SEARCH
+    //searches for a vehicle in the database by its registration number
+    public Vehicle getVehicleByNumber(String vehicleNumber)
+    {
+        //SQL select statement with a WHERE clause to filter by vehicle number
+        String sql = "SELECT * FROM Vehicles WHERE vehicleNumber = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) 
+        {
+            //put the vehicle number into the SQL statement's placeholder
+            statement.setString(1, vehicleNumber);
+
+            //execute the SELECT query
+            ResultSet resultSet = statement.executeQuery();
+
+            //if matching vehicle exists,create and return the object
+            if (resultSet.next()) 
+            {
+                return createVehicleFromResultSet(resultSet);
+            }
+        } 
+        catch (SQLException e) 
+        {
+            System.out.println("Error searching vehicle from the database: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    //UPDATE
+    //update an existing vehicle in the database
+    public boolean updateVehicle(Vehicle vehicle)
+    {
+        //SQL update statement with a WHERE clause to filter by vehicle ID
+        String sql = "UPDATE Vehicles SET"
+                    +" vehicleNumber = ?,"
+                    +" ownerName = ?,"
+                    +" contactNumber = ?"
+                    + " WHERE vehicleId = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) 
+        {
+            //set the new values
+            statement.setString(1, vehicle.getVehicleNumber());
+            statement.setString(2, vehicle.getOwnerName());
+            statement.setString(3, vehicle.getContactNumber());
+
+            //use the vehicle ID to identify which vehicle to update
+            statement.setInt(4, vehicle.getVehicleId());
+
+            //execute the UPDATE statement and return true if the update was successful
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        }
+        catch (SQLException e) 
+        {
+            System.out.println("Error updating vehicle in the database: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    //DELETE
+    //delete a vehicle from the database by its ID
+    public boolean deleteVehicle(int vehicleId)
+    {
+        //SQL delete statement with a WHERE clause to filter by vehicle ID
+        String sql = "DELETE FROM Vehicles"
+                    +" WHERE vehicleId = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) 
+        {
+            //set the vehicle ID in the SQL statement's placeholder
+            statement.setInt(1, vehicleId);
+
+            //execute the DELETE statement and return true if the deletion was successful
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        } 
+        catch (SQLException e) 
+        {
+            System.out.println("Error deleting vehicle from the database: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    //HELPER METHOD
+    //converts one database row into a java vehicle object
+    private Vehicle createVehicleFromResultSet(ResultSet resultSet) throws SQLException
+    {
+        //get the vehicle information from the result set
+        int vehicleId = resultSet.getInt("vehicleId");
+        String vehicleNumber = resultSet.getString("vehicleNumber");
+        String ownerName = resultSet.getString("ownerName");
+        String contactNumber = resultSet.getString("contactNumber");
+        String vehicleType = resultSet.getString("vehicleType");
+
+        //create a new vehicle object based on the vehicle type
+        switch (vehicleType.toLowerCase()) 
+        {
+            case "car":
+                return new Car(vehicleId, vehicleNumber, ownerName, contactNumber);
+            case "motorbike":
+                return new Motorbike(vehicleId, vehicleNumber, ownerName, contactNumber);
+            case "van":
+                return new Van(vehicleId, vehicleNumber, ownerName, contactNumber);
+            default:
+                throw new SQLException("Unknown vehicle type: " + vehicleType);
+        }
+    }
+
+}
