@@ -1,6 +1,6 @@
 package parking.gui;
 
-import parking.dao.ParkingSessionDAO;
+import parking.service.ParkingService;
 import parking.model.ParkingSession;
 
 import javax.swing.*;
@@ -16,7 +16,7 @@ public class ParkingExitGUI extends JFrame {
     private JLabel durationLabel;
     private JLabel feeLabel;
 
-    private ParkingSessionDAO parkingSessionDAO;
+    private ParkingService ParkingService;
 
     // Parking fee: Rs. 50 per hour
     private static final double HOURLY_RATE = 50.00;
@@ -24,8 +24,8 @@ public class ParkingExitGUI extends JFrame {
 
     public ParkingExitGUI() {
 
-        parkingSessionDAO =
-                new ParkingSessionDAO();
+        ParkingService =
+        new ParkingService();
 
         setTitle("Parking Exit");
 
@@ -262,10 +262,10 @@ public class ParkingExitGUI extends JFrame {
             // Find session
 
             ParkingSession session =
-                    parkingSessionDAO
-                            .getSessionById(
-                                    sessionId
-                            );
+           ParkingService
+                .getSessionById(
+                        sessionId
+                );
 
 
             if (session == null) {
@@ -343,13 +343,10 @@ public class ParkingExitGUI extends JFrame {
             
 
             boolean success =
-                    parkingSessionDAO
-                            .completeSession(
-                                    sessionId,
-                                    exitTime,
-                                    (int) durationMinutes,
-                                    fee
-                            );
+           ParkingService
+                .completeParkingSession(
+                        sessionId
+                );
 
 
             if (success) {
