@@ -321,15 +321,25 @@ public class VehicleManagementGUI extends JFrame {
                     );
 
 
-            if (success) {
+                if (success) {
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Vehicle registered successfully!",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
+        String message =
+            "VEHICLE REGISTERED SUCCESSFULLY!\n\n" +
+            "Vehicle ID      : " + vehicle.getVehicleId() + "\n" +
+            "Vehicle Number  : " + vehicle.getVehicleNumber() + "\n" +
+            "Owner Name      : " + vehicle.getOwnerName() + "\n" +
+            "Contact Number  : " + vehicle.getContactNumber() + "\n" +
+            "Vehicle Type    : " + vehicle.getVehicleType() + "\n\n" +
+            "Please remember your Vehicle ID for parking.";
 
+         JOptionPane.showMessageDialog(
+            this,
+            message,
+            "Vehicle Registration Details",
+            JOptionPane.INFORMATION_MESSAGE
+       );
+
+    // Clear fields
 
                 // Clear fields
 

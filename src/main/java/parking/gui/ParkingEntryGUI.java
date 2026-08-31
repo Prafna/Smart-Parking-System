@@ -8,12 +8,13 @@ import parking.model.ParkingSlot;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ParkingEntryGUI extends JFrame {
 
     private JTextField vehicleIdField;
-    private JComboBox<String> slotComboBox;
+    private JComboBox<ParkingSlot> slotComboBox;
 
     private ParkingSlotDAO parkingSlotDAO;
     private ParkingSessionDAO parkingSessionDAO;
@@ -24,7 +25,7 @@ public class ParkingEntryGUI extends JFrame {
         parkingSessionDAO = new ParkingSessionDAO();
 
         setTitle("Parking Entry");
-        setSize(500, 400);
+        setSize(550, 450);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -96,13 +97,8 @@ public class ParkingEntryGUI extends JFrame {
 
         for (ParkingSlot slot : slots) {
 
-            slotComboBox.addItem(
-                    slot.getSlotId()
-                            + " - "
-                            + slot.getSlotNumber()
-                            + " - "
-                            + slot.getSlotType()
-            );
+            // Add the complete ParkingSlot object
+            slotComboBox.addItem(slot);
         }
 
         if (slots.isEmpty()) {
@@ -141,18 +137,14 @@ public class ParkingEntryGUI extends JFrame {
                 return;
             }
 
-            // Get selected slot information
-            String selectedSlot =
-                    slotComboBox
-                            .getSelectedItem()
-                            .toString();
+            // Get the selected ParkingSlot object
+            ParkingSlot selectedSlot =
+                    (ParkingSlot)
+                            slotComboBox.getSelectedItem();
 
-            // Extract Slot ID
+            // Get Slot ID
             int slotId =
-                    Integer.parseInt(
-                            selectedSlot
-                                    .split(" - ")[0]
-                    );
+                    selectedSlot.getSlotId();
 
             // Create parking session
             ParkingSession session =
@@ -171,21 +163,105 @@ public class ParkingEntryGUI extends JFrame {
             if (success) {
 
                 // Change slot status to Occupied
-                parkingSlotDAO
-                        .updateSlotStatus(
+                boolean slotUpdated =
+                        parkingSlotDAO.updateSlotStatus(
                                 slotId,
                                 "Occupied"
                         );
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Parking session started successfully!",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
+                if (!slotUpdated) {
 
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Parking session was created, " +
+                            "but the slot status could not be updated.",
+                            "Warning",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+
+                    return;
+                }
+
+                /*
+                 * Retrieve the newly created active session.
+                 * The database has generated the Session ID.
+                 */
+                ParkingSession createdSession =
+                        parkingSessionDAO
+                                .getActiveSessionByVehicle(
+                                        vehicleId
+                                );
+
+                if (createdSession != null) {
+
+                    // Format entry time for the user
+                    DateTimeFormatter formatter =
+                            DateTimeFormatter.ofPattern(
+                                    "dd MMM yyyy, hh:mm a"
+                            );
+
+                    String formattedEntryTime =
+                            createdSession
+                                    .getEntryTime()
+                                    .format(formatter);
+
+                    // Display complete parking information
+                    String message =
+                            "PARKING SESSION STARTED SUCCESSFULLY!\n\n" +
+
+                            "Session ID   : "
+                            + createdSession.getSessionId()
+                            + "\n" +
+
+                            "Vehicle ID   : "
+                            + createdSession.getVehicleId()
+                            + "\n" +
+
+                            "Slot ID      : "
+                            + createdSession.getSlotId()
+                            + "\n" +
+
+                            "Slot Number  : "
+                            + selectedSlot.getSlotNumber()
+                            + "\n" +
+
+                            "Slot Type    : "
+                            + selectedSlot.getSlotType()
+                            + "\n" +
+
+                            "Entry Time   : "
+                            + formattedEntryTime
+                            + "\n" +
+
+                            "Status       : "
+                            + createdSession.getSessionStatus()
+                            + "\n\n" +
+
+                            "Please keep your Session ID " +
+                            "for the payment process.";
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            message,
+                            "Parking Session Details",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+
+                } else {
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Parking session started, " +
+                            "but the session details could not be retrieved.",
+                            "Warning",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+                }
+
+                // Clear Vehicle ID field
                 vehicleIdField.setText("");
 
+                // Reload available slots
                 loadAvailableSlots();
 
             } else {
@@ -213,7 +289,8 @@ public class ParkingEntryGUI extends JFrame {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "An unexpected error occurred.",
+                    "An unexpected error occurred:\n"
+                    + e.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE
             );
